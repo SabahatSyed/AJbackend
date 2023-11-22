@@ -160,6 +160,11 @@ def find_bin_by_id(bin_id,street_id):
                 return house.bin
     return None
 
+@app.route('/', methods=['GET'])
+def home():
+    return "Hello"
+
+
 if __name__ == "__main__":
     display_header()
     app.run(debug=True)
