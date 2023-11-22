@@ -123,7 +123,7 @@ streets = [street_A, street_B, street_C]
 
 fill_threshold = 90
 
-@app.route('/bin/status/<bin_id>/<street_id>/', methods=['GET'])
+@app.route('/api/bin/status/<bin_id>/<street_id>/', methods=['GET'])
 def get_bin_status(bin_id,street_id):
     bin_obj = find_bin_by_id(bin_id,street_id)
     if bin_obj is not None:
@@ -132,7 +132,7 @@ def get_bin_status(bin_id,street_id):
     else:
         return jsonify({"error": "Bin not found"}), 404
 
-@app.route('/bin/recycle/<bin_id>/<street_id>', methods=['POST'])
+@app.route('/api/bin/recycle/<bin_id>/<street_id>', methods=['POST'])
 def start_recycling(bin_id,street_id):
     bin_obj = find_bin_by_id(bin_id,street_id)
     if bin_obj is not None:
@@ -144,7 +144,7 @@ def start_recycling(bin_id,street_id):
     else:
         return jsonify({"error": "Bin not found"}), 404
 
-@app.route('/bins', methods=['GET'])
+@app.route('/api/bins', methods=['GET'])
 def get_all_bins():
     all_bins = []
     for street in streets:
@@ -160,11 +160,6 @@ def find_bin_by_id(bin_id,street_id):
                 return house.bin
     return None
 
-@app.route('/', methods=['GET'])
-def home():
-    return "Hello"
-
 
 if __name__ == "__main__":
-    display_header()
     app.run(debug=True)
