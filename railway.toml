@@ -1,2 +1,0 @@
-[services]
-  app = "python app.py"
