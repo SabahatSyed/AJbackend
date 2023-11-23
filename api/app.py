@@ -1,6 +1,5 @@
 from flask import Flask, jsonify, request
 import random
-import winsound
 import time
 
 app = Flask(__name__)
@@ -20,7 +19,6 @@ class SmartWasteBin:
         self.fill_level = random.randint(0, 100)
         if self.fill_level >= 90:
             self.is_full = True
-            winsound.Beep(1000, 1000)
             send_street_message(self.location, f"Bin {self.bin_id} is full and needs to be emptied.")
         else:
             self.is_full = False
