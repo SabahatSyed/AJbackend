@@ -1,8 +1,11 @@
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 import random
 import time
 
 app = Flask(__name__)
+CORS(app)
+all_bins_data = []
 
 class SmartWasteBin:
     def __init__(self, bin_id, house_number, street_name):
@@ -131,12 +134,22 @@ def get_bin_status(bin_id,street_id):
         return jsonify({"error": "Bin not found"}), 404
 
 @app.route('/api/bin/recycle/<bin_id>/<street_id>', methods=['POST'])
-def start_recycling(bin_id,street_id):
-    bin_obj = find_bin_by_id(bin_id,street_id)
+def start_recycling(bin_id, street_id):
+    bin_obj = find_bin_by_id(bin_id, street_id)
     if bin_obj is not None:
         if not bin_obj.recycling_in_progress:
             bin_obj.start_recycling()
-            return jsonify({"message": f"Recycling process initiated for {bin_id}"}), 200
+
+            # Update status for all bins after recycling within the existing global list
+            for bin_data in all_bins_data:
+                if bin_data['bin_id'] == bin_id and bin_data['location'].endswith(street_id):
+                    bin_data['fill_level'] = 0  # Set fill level to 0
+                    bin_data['recycled'] += 1  # Increment recycled count
+
+            return jsonify({
+                "message": f"Recycling process initiated for {bin_id}",
+                "all_bins_data": all_bins_data
+            }), 200
         else:
             return jsonify({"error": f"Recycling process already in progress for {bin_id}"}), 400
     else:
@@ -144,12 +157,19 @@ def start_recycling(bin_id,street_id):
 
 @app.route('/api/bins', methods=['GET'])
 def get_all_bins():
-    all_bins = []
-    for street in streets:
-        for house in street.houses:
-            house.bin.update_fill_level()  # Simulate updating fill levels
-            all_bins.append(house.bin.get_bin_status())
-    return jsonify(all_bins)
+    global all_bins_data
+    # Check if data already exists
+    if not all_bins_data:
+        # Initialize the global list when first hit
+        for street in streets:
+            for house in street.houses:
+                house.bin.update_fill_level()  # Simulate updating fill levels
+                all_bins_data.append(house.bin.get_bin_status())
+    else:
+         for bin_data in all_bins_data:
+            bin_data['fill_level'] = min(bin_data['fill_level'] + random.randint(1, 10), 100)
+
+    return jsonify(all_bins_data)
 
 def find_bin_by_id(bin_id,street_id):
     for street in streets:
