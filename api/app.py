@@ -19,7 +19,7 @@ class SmartWasteBin:
         self.garbage_type = "plastic", "wires", "general", "glass" 
 
     def update_fill_level(self):
-        self.fill_level = random.randint(0, 100)
+        self.fill_level = 0
         if self.fill_level >= 90:
             self.is_full = True
             send_street_message(self.location, f"Bin {self.bin_id} is full and needs to be emptied.")
@@ -167,7 +167,7 @@ def get_all_bins():
                 all_bins_data.append(house.bin.get_bin_status())
     else:
          for bin_data in all_bins_data:
-            bin_data['fill_level'] = min(bin_data['fill_level'] + random.randint(1, 10), 100)
+            bin_data['fill_level'] = min(bin_data['fill_level'] + 25)
 
     return jsonify(all_bins_data)
 
