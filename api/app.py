@@ -158,16 +158,33 @@ def start_recycling(bin_id, street_id):
 @app.route('/api/bins', methods=['GET'])
 def get_all_bins():
     global all_bins_data
+    fill_levels_sequence = [0, 32, 45, 75, 85, 95]
+    print("sdj")
     # Check if data already exists
     if not all_bins_data:
         # Initialize the global list when first hit
         for street in streets:
             for house in street.houses:
                 house.bin.update_fill_level()  # Simulate updating fill levels
+
+                # If fill level is 0, set it to the first value in the sequence
+                if house.bin.fill_level == 0:
+                    house.bin.fill_level = fill_levels_sequence[0]
+
                 all_bins_data.append(house.bin.get_bin_status())
     else:
-         for bin_data in all_bins_data:
-            bin_data['fill_level'] = min(bin_data['fill_level'] + 25)
+        for bin_data in all_bins_data:
+            # If fill level is 0, set it to the first value in the sequence
+            if bin_data['fill_level'] == 0:
+                bin_data['fill_level'] = fill_levels_sequence[1]
+            elif bin_data['fill_level'] == 32:
+                bin_data['fill_level'] = fill_levels_sequence[2]
+            elif bin_data['fill_level'] == 45:
+                bin_data['fill_level'] = fill_levels_sequence[3]
+            elif bin_data['fill_level'] == 75:
+                bin_data['fill_level'] = fill_levels_sequence[4]
+            elif bin_data['fill_level'] == 85:
+                bin_data['fill_level'] = fill_levels_sequence[5]
 
     return jsonify(all_bins_data)
 
